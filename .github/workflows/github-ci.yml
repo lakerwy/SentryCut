@@ -55,6 +55,7 @@ jobs:
             --exclude "ai-video-mixer-api/clips/" \
             --exclude "ai-video-mixer-api/output/" \
             --exclude "ai-video-mixer-api/data/" \
+            --exclude "ai-video-mixer-api/data.bak*/" \
             --exclude "ai-video-mixer-web/node_modules/" \
             --exclude "ai-video-mixer-web/dist/" \
             ./ "${DEPLOY_DIR}/"
