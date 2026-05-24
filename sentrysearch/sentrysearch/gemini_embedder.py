@@ -57,7 +57,7 @@ class GeminiQuotaError(RuntimeError):
 # ---------------------------------------------------------------------------
 
 def _retry(fn, *, max_retries: int = 5, initial_delay: float = 2.0, max_delay: float = 60.0):
-    """Call *fn* with exponential back-off on transient errors (429, 503)."""
+    """Call *fn* with exponential back-off on transient API/network errors."""
     delay = initial_delay
     for attempt in range(max_retries + 1):
         try:
@@ -67,7 +67,18 @@ def _retry(fn, *, max_retries: int = 5, initial_delay: float = 2.0, max_delay: f
             status = getattr(exc, "status_code", None) or getattr(exc, "code", None)
             retryable = status in (429, 503)
             if not retryable:
-                retryable = "resource exhausted" in msg or "503" in msg or "429" in msg
+                retryable = (
+                    "resource exhausted" in msg
+                    or "503" in msg
+                    or "429" in msg
+                    or "server disconnected" in msg
+                    or "connection reset" in msg
+                    or "connection aborted" in msg
+                    or "remote protocol error" in msg
+                    or "read timeout" in msg
+                    or "write timeout" in msg
+                    or "timed out" in msg
+                )
             if not retryable or attempt == max_retries:
                 if "resource exhausted" in msg or status == 429:
                     raise GeminiQuotaError(
