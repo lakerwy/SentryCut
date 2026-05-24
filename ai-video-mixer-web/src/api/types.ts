@@ -10,6 +10,7 @@ export interface Material {
   width: number | null;
   height: number | null;
   fps: number | null;
+  file_size: number | null;
   status: string;
   embedding_backend: string | null;
   embedding_model: string | null;
