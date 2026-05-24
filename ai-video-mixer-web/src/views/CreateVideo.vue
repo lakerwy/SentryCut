@@ -1,92 +1,94 @@
 <template>
-  <section>
-    <header class="page-header">
-      <div>
-        <h2>创建视频</h2>
-        <p>输入口播文案，生成分镜并匹配素材，一键合成带配音和字幕的 MP4。</p>
-      </div>
-      <el-button :icon="FolderOpened" @click="$router.push('/materials')">素材库</el-button>
-    </header>
+  <div>
+    <div class="page-header">
+      <h2>创建视频</h2>
+      <p>输入口播文案，生成分镜并匹配素材，一键合成带配音和字幕的 MP4。</p>
+    </div>
 
     <div class="workspace-grid">
-      <div class="panel">
-        <h3 class="panel-title">口播设置</h3>
-        <el-form label-position="top">
-          <el-form-item label="口播文案">
-            <el-input
-              v-model="script"
-              type="textarea"
-              :rows="10"
-              resize="vertical"
-              placeholder="请输入完整口播文案"
-            />
-          </el-form-item>
-          <el-form-item label="视频比例">
-            <el-segmented v-model="aspectRatio" :options="aspectOptions" />
-          </el-form-item>
-          <el-form-item label="配音音色">
-            <el-select v-model="voice" style="width: 100%">
-              <el-option label="中文女声-晓晓" value="zh-CN-XiaoxiaoNeural" />
-              <el-option label="中文男声-云希" value="zh-CN-YunxiNeural" />
-              <el-option label="中文男声-云健" value="zh-CN-YunjianNeural" />
-              <el-option label="中文女声-晓伊" value="zh-CN-XiaoyiNeural" />
-            </el-select>
-          </el-form-item>
-          <div class="toolbar">
-            <el-button type="primary" :icon="DocumentChecked" :loading="planning" @click="handlePlan">
-              生成分镜
-            </el-button>
-            <el-button :icon="Search" :loading="matching" :disabled="segments.length === 0" @click="handleMatch">
-              匹配素材
-            </el-button>
-            <el-button type="success" :icon="VideoPlay" :loading="rendering" @click="handleRender">
-              生成视频
-            </el-button>
-          </div>
-        </el-form>
+      <div class="card" style="padding: var(--space-5);">
+        <h3 style="margin: 0 0 var(--space-4); font-size: var(--text-lg);">口播设置</h3>
 
-        <div v-if="taskStore.currentTask?.type === 'render'" class="status-line">
-          <el-tag :type="taskStore.currentTask.status === 'failed' ? 'danger' : 'warning'">
-            {{ taskStore.currentTask.status }}
-          </el-tag>
-          <el-progress :percentage="taskStore.currentTask.progress" style="width: 260px" />
-          <span class="muted">{{ taskStore.currentTask.current_step }}</span>
+        <div style="margin-bottom: var(--space-4);">
+          <label style="display: block; font-size: var(--text-sm); font-weight: 500; margin-bottom: var(--space-2);">口播文案</label>
+          <textarea
+            v-model="script"
+            class="input"
+            style="width: 100%; min-height: 200px; resize: vertical;"
+            placeholder="请输入完整口播文案"
+          ></textarea>
+        </div>
+
+        <div style="margin-bottom: var(--space-4);">
+          <label style="display: block; font-size: var(--text-sm); font-weight: 500; margin-bottom: var(--space-2);">视频比例</label>
+          <div style="display: flex; gap: var(--space-2);">
+            <button
+              v-for="ratio in aspectOptions"
+              :key="ratio"
+              class="btn"
+              :class="aspectRatio === ratio ? 'btn-primary' : 'btn-ghost'"
+              @click="aspectRatio = ratio"
+            >{{ ratio }}</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom: var(--space-4);">
+          <label style="display: block; font-size: var(--text-sm); font-weight: 500; margin-bottom: var(--space-2);">配音音色</label>
+          <select v-model="voice" class="input" style="width: 100%;">
+            <option value="zh-CN-XiaoxiaoNeural">中文女声-晓晓</option>
+            <option value="zh-CN-YunxiNeural">中文男声-云希</option>
+            <option value="zh-CN-YunjianNeural">中文男声-云健</option>
+            <option value="zh-CN-XiaoyiNeural">中文女声-晓伊</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: var(--space-2);">
+          <button class="btn btn-primary" :disabled="planning" @click="handlePlan">
+            {{ planning ? '处理中...' : '生成分镜' }}
+          </button>
+          <button class="btn btn-ghost" :disabled="matching || segments.length === 0" @click="handleMatch">
+            匹配素材
+          </button>
+          <button class="btn btn-accent" :disabled="rendering" @click="handleRender">
+            {{ rendering ? '生成中...' : '生成视频' }}
+          </button>
+        </div>
+
+        <div v-if="taskStore.currentTask?.type === 'render'" style="margin-top: var(--space-4); display: flex; align-items: center; gap: var(--space-3);">
+          <span class="text-muted" style="font-size: var(--text-sm);">{{ taskStore.currentTask.status }}</span>
+          <div style="flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
+            <div style="height: 100%; background: var(--accent); transition: width 0.3s;" :style="{ width: taskStore.currentTask.progress + '%' }"></div>
+          </div>
+          <span class="text-muted" style="font-size: var(--text-xs);">{{ taskStore.currentTask.current_step }}</span>
         </div>
       </div>
 
-      <div class="panel">
-        <h3 class="panel-title">分镜预览</h3>
-        <div v-if="segments.length === 0" class="empty-state">
-          输入文案后生成分镜，匹配结果会显示在这里。
+      <div class="card" style="padding: var(--space-5);">
+        <h3 style="margin: 0 0 var(--space-4); font-size: var(--text-lg);">分镜预览</h3>
+
+        <div v-if="segments.length === 0" class="empty-state" style="min-height: 200px;">
+          <p>输入文案后生成分镜，匹配结果会显示在这里。</p>
         </div>
-        <div v-else class="segment-list">
-          <article v-for="segment in segments" :key="segment.index" class="segment-item">
-            <div class="segment-head">
-              <strong>分镜 {{ segment.index }}</strong>
-              <el-tag v-if="segment.similarity_score != null" type="success">
-                {{ segment.similarity_score.toFixed(2) }}
-              </el-tag>
+
+        <div v-else style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <div v-for="segment in segments" :key="segment.index" style="border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-3); background: var(--bg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+              <strong style="font-size: var(--text-sm);">分镜 {{ segment.index }}</strong>
+              <span v-if="segment.similarity_score != null" class="text-accent" style="font-size: var(--text-xs);">{{ segment.similarity_score.toFixed(2) }}</span>
             </div>
-            <p><b>口播：</b>{{ segment.narration }}</p>
-            <p><b>画面：</b>{{ segment.visual_query }}</p>
-            <div class="metric-row">
-              <el-tag type="info">{{ segment.estimated_duration ?? "-" }}s</el-tag>
-              <el-tag v-if="segment.source_start_time != null" type="warning">
-                {{ formatSeconds(segment.source_start_time) }} - {{ formatSeconds(segment.source_end_time) }}
-              </el-tag>
-            </div>
-          </article>
+            <p style="font-size: var(--text-sm); margin: var(--space-1) 0;"><b>口播：</b>{{ segment.narration }}</p>
+            <p style="font-size: var(--text-sm); margin: var(--space-1) 0; color: var(--muted);"><b>画面：</b>{{ segment.visual_query }}</p>
+          </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import { DocumentChecked, FolderOpened, Search, VideoPlay } from "@element-plus/icons-vue";
 import { matchClips, planScript, renderVideo } from "@/api/video";
 import type { AspectRatio, Segment, Task } from "@/api/types";
 import { useTaskStore } from "@/stores/task";
@@ -96,18 +98,11 @@ const taskStore = useTaskStore();
 const script = ref("");
 const voice = ref("zh-CN-XiaoxiaoNeural");
 const aspectRatio = ref<AspectRatio>("9:16");
-const aspectOptions = ["9:16", "16:9", "1:1"];
+const aspectOptions = ["9:16", "16:9", "1:1"] as AspectRatio[];
 const segments = ref<Segment[]>([]);
 const planning = ref(false);
 const matching = ref(false);
 const rendering = ref(false);
-
-function formatSeconds(value?: number | null) {
-  if (value == null) return "-";
-  const m = Math.floor(value / 60);
-  const s = Math.round(value % 60);
-  return `${m}:${String(s).padStart(2, "0")}`;
-}
 
 function requireScript() {
   if (!script.value.trim()) {
