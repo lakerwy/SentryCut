@@ -474,6 +474,56 @@ h3 { font-size: var(--text-xl); }
   box-shadow: 0 4px 20px oklch(20% 0.02 60 / 0.08);
 }
 
+.asset-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.asset-checkbox {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 5;
+}
+
+.asset-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.asset-delete {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: oklch(20% 0.02 60 / 0.7);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.asset-card:hover .asset-delete {
+  opacity: 1;
+}
+
+.asset-delete:hover {
+  background: var(--danger);
+}
+
+.asset-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .asset-thumbnail {
   aspect-ratio: 16/9;
   background: linear-gradient(135deg, var(--border) 0%, var(--surface-hover) 100%);
