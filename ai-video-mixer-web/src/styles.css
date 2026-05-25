@@ -552,7 +552,7 @@ h3 { font-size: var(--text-xl); }
 .asset-type {
   position: absolute;
   top: var(--space-2);
-  left: var(--space-2);
+  left: 32px;
   background: var(--surface);
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
@@ -1099,4 +1099,106 @@ h3 { font-size: var(--text-xl); }
 
 .el-message--error .el-message__icon {
   color: var(--danger) !important;
+}
+
+/* ============================================
+   VIDEO PLAYER MODAL
+   ============================================ */
+.video-modal {
+  position: fixed;
+  inset: 0;
+  background: oklch(20% 0.02 60 / 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-6);
+}
+
+.video-modal-content {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  max-width: 960px;
+  width: 100%;
+  box-shadow: 0 24px 48px oklch(20% 0.02 60 / 0.3);
+}
+
+.video-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.video-modal-title {
+  font-weight: 500;
+  font-size: var(--text-base);
+  color: var(--fg);
+}
+
+.video-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--surface-hover);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.video-modal-close:hover {
+  background: var(--border);
+  color: var(--fg);
+}
+
+/* Play Button on Thumbnail */
+.asset-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: oklch(20% 0.02 60 / 0.7);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.asset-card:hover .asset-play {
+  opacity: 1;
+}
+
+.asset-play:hover {
+  background: var(--accent);
+}
+.asset-play svg { margin-left: 3px; }
+
+.video-modal-body {
+  aspect-ratio: 16/9;
+  background: oklch(15% 0.02 240);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.video-modal-body video {
+  width: 100%;
+  height: 100%;
+  max-height: 70vh;
+  display: block;
 }

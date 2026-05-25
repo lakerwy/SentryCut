@@ -24,6 +24,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.mount("/static/output", StaticFiles(directory=settings.output_dir), name="output")
+    app.mount("/static/materials", StaticFiles(directory=settings.materials_dir), name="materials")
     app.include_router(materials.router, prefix=settings.api_prefix)
     app.include_router(scripts.router, prefix=settings.api_prefix)
     app.include_router(videos.router, prefix=settings.api_prefix)

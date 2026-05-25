@@ -66,6 +66,28 @@
       </div>
     </div>
 
+    <!-- Video Player Modal -->
+    <div v-if="playingMaterial" class="video-modal" @click.self="closePlayer">
+      <div class="video-modal-content">
+        <div class="video-modal-header">
+          <span class="video-modal-title">{{ playingMaterial.original_filename }}</span>
+          <button class="video-modal-close" @click="closePlayer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="video-modal-body">
+          <video
+            :src="`/static/materials/${playingMaterial.stored_filename}`"
+            controls
+            autoplay
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- Asset Grid -->
     <div v-if="materials.length > 0" class="asset-grid">
       <div
@@ -75,7 +97,7 @@
         :class="{ selected: isSelected(material.id) }"
         @click="toggleSelection(material.id)"
       >
-        <div class="asset-thumbnail">
+        <div class="asset-thumbnail" @click.stop="openPlayer(material)">
           <div class="asset-checkbox" @click.stop>
             <input
               type="checkbox"
@@ -85,6 +107,11 @@
           </div>
           <div class="asset-type">视频</div>
           <div v-if="material.duration" class="asset-duration">{{ formatDuration(material.duration) }}</div>
+          <button class="asset-play" @click.stop="openPlayer(material)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-left: 2px;">
+              <polygon points="5,3 19,12 5,21"/>
+            </svg>
+          </button>
           <button
             class="asset-delete"
             :disabled="material.status === 'indexing' || deletingId === material.id"
@@ -124,7 +151,16 @@ const materials = ref<Material[]>([]);
 const loading = ref(false);
 const selectedIds = ref<string[]>([]);
 const deletingId = ref("");
+const playingMaterial = ref<Material | null>(null);
 const taskStore = useTaskStore();
+
+function openPlayer(material: Material) {
+  playingMaterial.value = material;
+}
+
+function closePlayer() {
+  playingMaterial.value = null;
+}
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
